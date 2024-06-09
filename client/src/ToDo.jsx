@@ -1,15 +1,15 @@
-import React,{useState,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './ToDo.css';
 
-function ToDo(){
-    const [task,setTask] = useState("");
-    const [submittask,setSubmitTask] = useState([]);
+function ToDo() {
+    const [task, setTask] = useState("");
+    const [submittask, setSubmitTask] = useState([]);
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await axios.get('http://localhost:5000/tasks');
+                const response = await axios.get('https://dotask-2.onrender.com/tasks');
                 setSubmitTask(response.data);
             } catch (error) {
                 console.error('Error fetching tasks:', error);
@@ -19,16 +19,16 @@ function ToDo(){
     }, []);
 
     
-    function handleChange(event){
+    function handleChange(event) {
         setTask(event.target.value)
     }
 
-    async function submitTask(event){
+    async function submitTask(event) {
         event.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5000/form',{name:task});
-            const newTask=response.data.name;
-            setSubmitTask([...submittask,newTask]);
+            const response = await axios.post('https://dotask-2.onrender.com/form', { name: task });
+            const newTask = response.data.name;
+            setSubmitTask([...submittask, newTask]);
             setTask("");
         } catch (error) {
             console.error('There was an error submitting the form!', error);
@@ -36,15 +36,10 @@ function ToDo(){
     }
 
 
-    async function completeTask(deleteTask){
+    async function completeTask(deleteTask) {
         try {
-            await axios.post('http://localhost:5000/delete',{name:deleteTask});
-            const updatedTask=[];
-            for(let i=0;i<submittask.length;i++){
-                if(submittask[i]!==deleteTask){
-                        updatedTask.push(submittask[i]);
-                    }
-            }
+            await axios.post('https://dotask-2.onrender.com/delete', { name: deleteTask });
+            const updatedTask = submittask.filter(task => task !== deleteTask);
             setSubmitTask(updatedTask);
         } catch (error) {
             console.error('There was an error submitting the form!', error);
@@ -52,7 +47,7 @@ function ToDo(){
     }
 
 
-    return(
+    return (
         <div className="todo-container">
             <h1>To Do List</h1>
             <form onSubmit={submitTask} className="todo-form">
@@ -66,8 +61,8 @@ function ToDo(){
                 <button className="todo-submit-button">Submit</button>
             </form>
             <ul className="todo-list">
-               {submittask.map(tasks=>(
-                    <li onClick={()=>completeTask(tasks)} className="todo-item">{tasks}</li>
+               {submittask.map(tasks => (
+                    <li key={tasks} onClick={() => completeTask(tasks)} className="todo-item">{tasks}</li>
                ))}
             </ul>
         </div>
